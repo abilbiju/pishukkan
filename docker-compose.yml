@@ -1,0 +1,18 @@
+services:
+  pishukkan:
+    build: .
+    env_file: .env
+    ports: ["8000:8000"]
+    volumes:
+      - "./pishukkan.db:/srv/pishukkan/pishukkan.db"
+      - "./private_receipts:/srv/pishukkan/private_receipts"
+    restart: unless-stopped
+  telegram:
+    build: .
+    command: ["python", "-m", "app.bot"]
+    env_file: .env
+    volumes:
+      - "./pishukkan.db:/srv/pishukkan/pishukkan.db"
+      - "./private_receipts:/srv/pishukkan/private_receipts"
+    restart: unless-stopped
+    profiles: ["bot"]

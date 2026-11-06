@@ -1,0 +1,64 @@
+services:
+  - type: web
+    name: pishukkan-web
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /api/health
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
+      - key: GROQ_MODEL
+        value: qwen/qwen3.8-27b
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_MODEL
+        value: gemini-2.0-flash
+      - key: LLM_PROVIDER
+        value: auto
+      - key: APP_SECRET
+        generateValue: true
+      - key: DASHBOARD_API_TOKEN
+        generateValue: true
+      - key: ALLOWED_ORIGINS
+        value: https://pishukkan-web.onrender.com
+      - key: RECEIPT_DIR
+        value: /tmp/private_receipts
+      - key: PORT
+        value: "10000"
+
+  - type: worker
+    name: pishukkan-telegram
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerCommand: python -m app.bot
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
+      - key: GROQ_MODEL
+        value: qwen/qwen3.8-27b
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_MODEL
+        value: gemini-2.0-flash
+      - key: LLM_PROVIDER
+        value: auto
+      - key: APP_SECRET
+        fromService:
+          type: web
+          name: pishukkan-web
+          envVarKey: APP_SECRET
+      - key: DASHBOARD_API_TOKEN
+        fromService:
+          type: web
+          name: pishukkan-web
+          envVarKey: DASHBOARD_API_TOKEN
+      - key: RECEIPT_DIR
+        value: /tmp/private_receipts
